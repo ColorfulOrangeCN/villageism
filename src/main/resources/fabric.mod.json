@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "villageism",
+  "version": "${version}",
+  "name": "villageism",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/colorfulorangecn/villageism"
+  },
+  "license": "MIT",
+  "icon": "assets/villageism/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "villagist.villageism.client.VillageismClient"
+    ],
+    "main": [
+      "villagist.villageism.Villageism"
+    ]
+  },
+  "mixins": [
+    "villageism.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
