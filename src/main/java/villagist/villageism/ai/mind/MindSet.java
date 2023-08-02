@@ -5,6 +5,7 @@ import villagist.villageism.ai.mind.status.Status;
 import villagist.villageism.util.VillageismHeap;
 import villagist.villageism.util.VillageismPair;
 
+import java.util.List;
 import java.util.Queue;
 
 public class MindSet {
@@ -13,7 +14,7 @@ public class MindSet {
     protected VillageismHeap<Idea> ideaHeap;
 
     // Same as the heap above in functions.
-    protected VillageismHeap<Inspiration> inspirationHeap;
+    protected Object2LongMap<Inspiration> inspirationHeap;
 
     // A structure that stores all the potential factors affecting the decisions of this mind.
     protected Status status;
