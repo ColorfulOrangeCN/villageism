@@ -1,12 +1,12 @@
-package villagist.villageism.ai.mind.Status;
+package villagist.villageism.ai.mind.status;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-public class VillageismStatus {
+public class Status {
 
     private Object2LongMap<String> statusSet;
 
-    public VillageismStatus() {
+    public Status() {
         // TODO: Initialise itself.
     }
 

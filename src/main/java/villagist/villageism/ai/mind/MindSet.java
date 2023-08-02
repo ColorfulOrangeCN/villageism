@@ -1,36 +1,33 @@
 package villagist.villageism.ai.mind;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import villagist.villageism.ai.mind.Ideas.VillageismIdeaType;
-import villagist.villageism.ai.mind.Inspirations.VillageismInspiration;
-import villagist.villageism.ai.mind.Status.VillageismStatus;
+import villagist.villageism.ai.mind.status.Status;
 import villagist.villageism.util.VillageismHeap;
 import villagist.villageism.util.VillageismPair;
 
 import java.util.Queue;
-import java.util.Set;
 
-public class VillageismMindSet {
+public class MindSet {
 
     // It should allow get an element by its key, while also allowing sort elements by their value.
-    protected VillageismHeap<VillageismIdeaType> ideaHeap;
+    protected VillageismHeap<Idea> ideaHeap;
 
     // Same as the heap above in functions.
-    protected VillageismHeap<VillageismInspiration> inspirationHeap;
+    protected VillageismHeap<Inspiration> inspirationHeap;
 
     // A structure that stores all the potential factors affecting the decisions of this mind.
-    protected VillageismStatus status;
+    protected Status status;
 
-    protected Queue<VillageismPair<VillageismIdeaType>> potentialDecisions;
+    protected Queue<VillageismPair<Idea>> potentialDecisions;
 
     static final int considerationDepth = 114;
 
-    public VillageismMindSet() {
+    public MindSet() {
         // TODO: Initialise the inspirations.
     }
 
-    protected void apply(Object2LongMap<VillageismIdeaType> modifier) {
-        for (VillageismIdeaType idea : modifier.keySet()) {
+    protected void apply(Object2LongMap<Idea> modifier) {
+        for (Idea idea : modifier.keySet()) {
             long newWeight = ideaHeap.getLong(idea) + modifier.getLong(idea);
             ideaHeap.remove(idea);
             ideaHeap.insert(idea, newWeight);
@@ -46,18 +43,18 @@ public class VillageismMindSet {
         status.update(gameContext);
         reassignInspirationWeight(gameContext);
 
-        for (VillageismInspiration inspiration : inspirationHeap.keySet()) {
+        for (Inspiration inspiration : inspirationHeap.keySet()) {
             this.apply(inspiration.refreshMinds(status, inspirationHeap.getLong(inspiration)));
         }
 
         int considerationCounter = considerationDepth;
         while (!ideaHeap.isEmpty() && considerationCounter != 0) {
-            VillageismIdeaType idea = ideaHeap.top();
+            Idea idea = ideaHeap.top();
 
-            Object2LongMap<VillageismIdeaType> modifier = idea.getRequirements(status, ideaHeap.getLong(idea));
+            Object2LongMap<Idea> modifier = idea.getRequirements(status, ideaHeap.getLong(idea));
             // Check whether the current action will be replaced.
             if (modifier.isEmpty()) {
-                potentialDecisions.add(new VillageismPair<VillageismIdeaType>(idea, ideaHeap.getLong(idea)));
+                potentialDecisions.add(new VillageismPair<Idea>(idea, ideaHeap.getLong(idea)));
             }
             // If the idea affects itself, the change will also be applied here.
             this.apply(modifier);
@@ -67,7 +64,7 @@ public class VillageismMindSet {
         }
     }
 
-    public VillageismPair<VillageismIdeaType> decide() {
+    public VillageismPair<Idea> decide() {
         return potentialDecisions.poll();
     }
 
