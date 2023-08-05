@@ -9,7 +9,7 @@ public class Wall extends Cuboid {
     public Wall(int length, int height, Direction direction, BlockState material) {
         super(material,
                 new CuboidSize(direction.getVector().getX() * length,
-                        direction.getVector().getY() * height,
+                        height,
                         direction.getVector().getZ() * length));
         this.material = material;
         this.direction = direction;

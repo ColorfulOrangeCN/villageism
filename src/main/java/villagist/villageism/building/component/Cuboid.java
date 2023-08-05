@@ -1,10 +1,20 @@
 package villagist.villageism.building.component;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.block.BlockState;
+import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.BlockStateArgumentType;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Debug;
+import villagist.villageism.building.BuildingPlan;
 import villagist.villageism.building.PlacedBlock;
 import villagist.villageism.building.math.CuboidSize;
+
+import java.util.ArrayList;
 
 public class Cuboid extends UniqueMaterial {
     CuboidSize target;
@@ -25,5 +35,30 @@ public class Cuboid extends UniqueMaterial {
             }
         }
         return goal;
+    }
+
+    @Debug
+    public static void registerDebugCommand() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            dispatcher.register(CommandManager.literal("villageismcreatecuboid")
+                    .then(CommandManager.argument("block_state", BlockStateArgumentType.blockState())
+                    .then(CommandManager.argument("starting_pos", BlockPosArgumentType.blockPos())
+                    .then(CommandManager.argument("extension_x", IntegerArgumentType.integer())
+                    .then(CommandManager.argument("extension_y", IntegerArgumentType.integer())
+                    .then(CommandManager.argument("extension_z", IntegerArgumentType.integer())
+                    .executes(context -> {
+                        BlockState block = BlockStateArgumentType.getBlockState(context, "block_state").getBlockState();
+                        BlockPos position = BlockPosArgumentType.getBlockPos(context, "starting_pos");
+                        int extension_x = IntegerArgumentType.getInteger(context, "extension_x");
+                        int extension_y = IntegerArgumentType.getInteger(context, "extension_y");
+                        int extension_z = IntegerArgumentType.getInteger(context, "extension_z");
+                        ArrayList<PlacedBlock> blockList = new BuildingPlan().addComponent(new Cuboid(block,
+                                new CuboidSize(extension_x, extension_y, extension_z)), position).serialisePlan();
+                        for (PlacedBlock placement : blockList) {
+                            context.getSource().getWorld().setBlockState(new BlockPos(placement.pos()), placement.block());
+                        }
+                        return 0;
+                    })))))));
+        });
     }
 }

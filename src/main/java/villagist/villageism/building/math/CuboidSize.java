@@ -7,10 +7,10 @@ public final class CuboidSize extends Vec3i {
         return new CuboidSize(1, 1, 1);
     }
     public CuboidSize(int x, int y, int z) {
-        super(x, y, z);
+        super(Math.abs(x), Math.abs(y), Math.abs(z));
     }
     public CuboidSize(Vec3i vec) {
-        super(Math.abs(vec.getX()), Math.abs(vec.getY()), Math.abs(vec.getZ()));
+        super(Math.abs(vec.getX()) + 1, Math.abs(vec.getY()) + 1, Math.abs(vec.getZ()) + 1);
     }
     public int getSize() {
         return getX() * getY() * getZ();
