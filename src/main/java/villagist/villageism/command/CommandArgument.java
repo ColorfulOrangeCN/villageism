@@ -12,5 +12,7 @@ public @interface CommandArgument {
      * @return name of argument
      */
     String value();
+    int[] argParameters() default {};
+    @Deprecated
     boolean useDefaultType() default true;
 }

@@ -12,6 +12,7 @@ import net.minecraft.command.argument.BlockStateArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.BlockPos;
+import org.lwjgl.system.CallbackI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,12 +22,14 @@ import java.util.Stack;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class CommandRegistry {
-    String[] prefix;
+    final String[] prefix;
     public static CommandRegistry MOD = new CommandRegistry("villageism");
     public static CommandRegistry COMPONENT = new CommandRegistry("villageism", "component");
+
     public CommandRegistry(String... prefix) {
         this.prefix = prefix;
     }
+
     LiteralArgumentBuilder<ServerCommandSource> buildCommand(ArgumentBuilder<ServerCommandSource, ?> arguments) {
         LiteralArgumentBuilder<ServerCommandSource> res = null;
         for (int i = prefix.length - 1; i >= 0; --i) {
@@ -39,21 +42,19 @@ public class CommandRegistry {
         }
         return res;
     }
-    LiteralArgumentBuilder<ServerCommandSource> passer;
-    public final void register(Method method, ArgumentType<?>... replaceArguments) throws IllegalStateException {
+
+    private void register(Method method/*, ArgumentType<?>... replaceArguments*/) throws IllegalStateException {
         CommandMethod anno = method.getAnnotation(CommandMethod.class);
         if (anno == null) {
             throw new IllegalStateException();
         }
         int permission = anno.permission();
-        // TODO
         String commandName = anno.value();
         Parameter[] arguments = method.getParameters();
         String[] argNames = new String[method.getParameterCount()];
         Class<?>[] parameterTypes = method.getParameterTypes();
-        int cur = 0;
         Stack<ArgumentBuilder<ServerCommandSource, ?>> builders = new Stack<>();
-        builders.push(literal(commandName));
+        builders.push(literal(commandName).requires(source -> source.hasPermissionLevel(permission)));
         for (int i = anno.isSourceNecessary() ? 1 : 0; i < arguments.length; ++i) {
             Parameter a = arguments[i];
             var arga = a.getAnnotation(CommandArgument.class);
@@ -61,19 +62,28 @@ public class CommandRegistry {
             ArgumentType<?> pass;
             if (arga.useDefaultType()) {
                 if (parameterTypes[i].equals(Integer.class)) {
-                    pass = IntegerArgumentType.integer();
+                    int[] argParameters = arga.argParameters();
+                    if (argParameters.length == 0) {
+                        pass = IntegerArgumentType.integer();
+                    } else if (argParameters.length == 1) {
+                        pass = IntegerArgumentType.integer(argParameters[0]);
+                    } else if (argParameters.length == 2) {
+                        pass = IntegerArgumentType.integer(argParameters[0], argParameters[1]);
+                    } else {
+                        throw new IllegalStateException();
+                    }
                 } else if (parameterTypes[i].equals(String.class)) {
                     pass = StringArgumentType.string();
                 } else if (parameterTypes[i].equals(BlockPos.class)) {
                     pass = BlockPosArgumentType.blockPos();
                 } else if (parameterTypes[i].equals(BlockState.class)) {
                     pass = BlockStateArgumentType.blockState();
-                }
+                } // else if ...
                 else {
                     throw new IllegalStateException();
                 }
             } else {
-                pass = replaceArguments[cur++];
+                throw new IllegalStateException();
             }
             builders.push(CommandManager.argument(argNames[i], pass));
         }
@@ -106,7 +116,7 @@ public class CommandRegistry {
         while (!builders.empty()) {
             bd = builders.pop().then(bd);
         }
-        passer = buildCommand(bd);
+        LiteralArgumentBuilder<ServerCommandSource> passer = buildCommand(bd);
         CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> dispatcher.register(passer)));
     }
 
