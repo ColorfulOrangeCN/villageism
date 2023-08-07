@@ -6,7 +6,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.BlockStateArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.BlockPos;
@@ -64,7 +66,10 @@ public class CommandRegistry {
                     pass = StringArgumentType.string();
                 } else if (parameterTypes[i].equals(BlockPos.class)) {
                     pass = BlockPosArgumentType.blockPos();
-                } else {
+                } else if (parameterTypes[i].equals(BlockState.class)) {
+                    pass = BlockStateArgumentType.blockState();
+                }
+                else {
                     throw new IllegalStateException();
                 }
             } else {
@@ -86,6 +91,8 @@ public class CommandRegistry {
                     args[i] = StringArgumentType.getString(context, argNames[i]);
                 } else if (parameterTypes[i].equals(BlockPos.class)) {
                     args[i] = BlockPosArgumentType.getBlockPos(context, argNames[i]);
+                } else if (parameterTypes[i].equals(BlockState.class)) {
+                    args[i] = BlockStateArgumentType.getBlockState(context, argNames[i]);
                 } else {
                     throw new IllegalStateException();
                 }
