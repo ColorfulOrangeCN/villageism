@@ -3,10 +3,12 @@ package villagist.villageism.building.designer;
 import net.minecraft.util.math.BlockPos;
 import villagist.villageism.building.Component;
 import villagist.villageism.building.Designer;
+import villagist.villageism.building.DesignerType;
 import villagist.villageism.building.Style;
 import villagist.villageism.building.component.Offset;
 import villagist.villageism.building.component.Pillar;
 
+@DesignerType("Pillars")
 public class Pillars extends AtomDesigner {
 
     BlockPos[] positions;
