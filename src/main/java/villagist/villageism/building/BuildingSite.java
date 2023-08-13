@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class BuildingSite {
     HashMap<BlockPos, BlockState> todo, done;
-    BuildingSite(BuildingPlan plan) {
+    BuildingSite(Construction plan) {
         todo = plan.plan;
         done = new HashMap<>();
     }

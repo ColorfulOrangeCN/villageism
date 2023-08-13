@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuildingPlan {
+public class Construction {
     HashMap<BlockPos, BlockState> plan;
     ArrayList<PlacedBlock> trash;
 
-    public BuildingPlan() {
+    public Construction() {
         plan = new HashMap<>();
         trash = new ArrayList<>();
     }
-    public BuildingPlan addComponent(@NotNull Component component, BlockPos anchor) {
+    public Construction addComponent(@NotNull Component component, BlockPos anchor) {
         trash = new ArrayList<>();
         for (PlacedBlock block : component.getStructure()) {
             BlockState old = plan.put(anchor.add(block.pos()), block.block());

@@ -1,11 +1,15 @@
 package villagist.villageism.building.component;
 
 import net.minecraft.block.BlockState;
-import villagist.villageism.building.Component;
 
-public abstract class UniqueMaterial implements Component {
+public class UniqueMaterial implements Painter {
     protected BlockState material;
     UniqueMaterial(BlockState material) {
         this.material = material;
+    }
+
+    @Override
+    public BlockState getState(int x, int y, int z) {
+        return material;
     }
 }
