@@ -4,7 +4,7 @@ import net.minecraft.block.BlockState;
 
 public class UniqueMaterial implements Painter {
     protected BlockState material;
-    UniqueMaterial(BlockState material) {
+    public UniqueMaterial(BlockState material) {
         this.material = material;
     }
 
